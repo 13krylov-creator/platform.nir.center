@@ -133,7 +133,7 @@ services:
       - OAUTH2_PROXY_REDIS_CONNECTION_URL=${REDIS_URL:-redis://redis:6379}
       - OAUTH2_PROXY_REDIS_PASSWORD=${REDIS_PASSWORD:-}
       # Redirect URL для callback (с портом для dev)
-      - OAUTH2_PROXY_REDIRECT_URL=http://${DOMAIN:-localhost}:${HTTP_PORT:-5056}/oauth2/callback
+      - OAUTH2_PROXY_REDIRECT_URL=http://${DOMAIN:-platform.nir.center}/oauth2/callback
       # Whitelist доменов для редиректа (динамический redirect на основе хоста)
       - OAUTH2_PROXY_WHITELIST_DOMAINS=.localhost:*,localhost:*
       # Logout - перенаправление на Keycloak logout для полной очистки сессии
