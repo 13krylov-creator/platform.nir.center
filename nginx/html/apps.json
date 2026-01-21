@@ -18,7 +18,16 @@
       "groups": ["admins"],
       "adminOnly": true,
       "status": "online"
-    }
+    },
+	{
+    "id": "anonymize",
+    "name": "anonymize",
+	"description": "Обезличиватель",
+    "url": "http://anonymize.nir.center",
+    "icon": "🌐",
+    "groups": ["admins", "app1-users"],
+    "status": "online"
+}
   ],
   "adminGroups": ["admins"]
 }
