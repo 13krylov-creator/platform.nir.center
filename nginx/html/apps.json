@@ -1,0 +1,24 @@
+{
+  "apps": [
+    {
+      "id": "app1",
+      "name": "Демо-приложение 1",
+      "description": "Пример защищенного приложения в Docker-контейнере. Демонстрирует работу SSO.",
+      "url": "/app1/",
+      "icon": "📊",
+      "groups": ["admins", "app1-users"],
+      "status": "online"
+    },
+    {
+      "id": "keycloak",
+      "name": "Keycloak Admin",
+      "description": "Консоль администрирования Identity Provider. Управление пользователями и группами.",
+      "url": "/keycloak-admin/",
+      "icon": "⚙️",
+      "groups": ["admins"],
+      "adminOnly": true,
+      "status": "online"
+    }
+  ],
+  "adminGroups": ["admins"]
+}

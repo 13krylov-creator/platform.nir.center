@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>НИР-Центр — Единая точка входа</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #E87722;
+            --primary-dark: #453C69;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8F9FA;
+            --bg-orange: #E87722;
+            --text-dark: #1A1A2E;
+            --text-gray: #6B7280;
+            --text-light: #9CA3AF;
+            --border-light: #E5E7EB;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        /* Навигация */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 4rem;
+            background: var(--bg-white);
+            border-bottom: 1px solid var(--border-light);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        
+        .logo img {
+            height: 24px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .nav-link:hover {
+            color: var(--primary-orange);
+        }
+        
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-light);
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            background: var(--primary-orange);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: var(--primary-orange);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #D16A1C;
+            transform: translateY(-1px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--primary-orange);
+            color: var(--primary-orange);
+        }
+        
+        /* Hero секция */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 500px;
+        }
+        
+        .hero-left {
+            background: var(--bg-orange);
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 1.5rem;
+            max-width: 400px;
+            line-height: 1.7;
+        }
+        
+        .hero-right {
+            background: var(--bg-light);
+            padding: 4rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            line-height: 1.8;
+            max-width: 500px;
+        }
+        
+        /* Секция приложений */
+        .apps-section {
+            padding: 4rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        
+        .section-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-light);
+            border-radius: 24px;
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+        
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .app-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-orange);
+        }
+        
+        .app-card.admin-only {
+            border-left: 4px solid var(--primary-orange);
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .app-status {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10B981;
+        }
+        
+        .status-dot.offline {
+            background: #EF4444;
+        }
+        
+        .app-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .app-description {
+            color: var(--text-gray);
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+        
+        .app-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .app-groups {
+            display: flex;
+            gap: 0.375rem;
+            flex-wrap: wrap;
+        }
+        
+        .app-group-tag {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-light);
+            color: var(--text-gray);
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .app-link {
+            color: var(--primary-orange);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .app-link svg {
+            transition: transform 0.2s;
+        }
+        
+        .app-card:hover .app-link svg {
+            transform: translateX(4px);
+        }
+        
+        /* Add app card (admin only) */
+        .add-app-card {
+            background: var(--bg-light);
+            border: 2px dashed var(--border-light);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .add-app-card:hover {
+            border-color: var(--primary-orange);
+            background: var(--bg-white);
+        }
+        
+        .add-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-orange);
+            margin-bottom: 1rem;
+            border: 2px solid var(--border-light);
+        }
+        
+        .add-app-card:hover .add-icon {
+            border-color: var(--primary-orange);
+        }
+        
+        .add-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .add-description {
+            font-size: 0.875rem;
+            color: var(--text-gray);
+            text-align: center;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-light);
+            padding: 3rem 4rem;
+            margin-top: 4rem;
+        }
+        
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .footer-logo img {
+            height: 20px;
+            opacity: 0.7;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-orange);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-gray);
+        }
+        
+        .modal-body p {
+            color: var(--text-gray);
+            margin-bottom: 1rem;
+        }
+        
+        .modal-body ol {
+            color: var(--text-gray);
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-body ol li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-body code {
+            background: var(--bg-light);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .modal-body pre {
+            background: var(--text-dark);
+            color: #E5E7EB;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-gray);
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-gray);
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .navbar {
+                padding: 1rem 2rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-left, .hero-right {
+                padding: 3rem 2rem;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .apps-section {
+                padding: 2rem;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer {
+                padding: 2rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="logo">
+            <img src="/logo.svg" alt="НИР-Центр">
+        </a>
+        
+        <div class="nav-menu" id="navMenu">
+            <!-- Динамически заполняется -->
+        </div>
+        
+        <div class="nav-right">
+            <div class="user-badge">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <span id="userName">Загрузка...</span>
+            </div>
+            <a href="#" onclick="logout(); return false;" class="btn btn-outline">Выйти</a>
+        </div>
+    </nav>
+    
+    <section class="hero">
+        <div class="hero-left">
+            <h1 class="hero-title">НИР—<br>ЦЕНТР</h1>
+            <p class="hero-subtitle">Многофункциональный научно-производственный центр</p>
+        </div>
+        <div class="hero-right">
+            <p class="hero-description">
+                Единая точка входа для всех корпоративных приложений. 
+                Безопасный доступ с использованием современных протоколов аутентификации.
+            </p>
+        </div>
+    </section>
+    
+    <section class="apps-section">
+        <div class="section-header">
+            <h2 class="section-title">Доступные приложения</h2>
+            <div class="section-badge" id="appsBadge">
+                <span id="appsCount">0</span> приложений
+            </div>
+        </div>
+        
+        <div class="apps-grid" id="appsGrid">
+            <div class="loading">Загрузка приложений...</div>
+        </div>
+    </section>
+    
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="/logo.svg" alt="НИР-Центр">
+            </div>
+            <div class="footer-links">
+                <a href="https://nir.center" target="_blank">nir.center</a>
+                <a href="/oauth2/userinfo">Профиль</a>
+                <a href="http://localhost:5058" target="_blank" id="keycloakLink" style="display:none;">Keycloak</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Модальное окно добавления приложения -->
+    <div class="modal" id="addAppModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Добавление приложения</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Для добавления нового приложения:</p>
+                <ol>
+                    <li>Создайте файл конфигурации в <code>nginx/conf.d/</code></li>
+                    <li>Используйте шаблон <code>30-app-docker-example.conf</code></li>
+                    <li>Добавьте приложение в <code>nginx/html/apps.json</code></li>
+                    <li>Перезапустите nginx: <code>docker compose restart nginx</code></li>
+                </ol>
+                <p>Пример записи в apps.json:</p>
+                <pre>{
+  "id": "myapp",
+  "name": "Мое приложение",
+  "description": "Описание",
+  "url": "http://myapp.localhost",
+  "icon": "🚀",
+  "groups": ["admins", "app1-users"],
+  "status": "online"
+}</pre>
+                <button class="btn btn-primary" onclick="closeModal()" style="width:100%;">Понятно</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Данные пользователя из SSI (заполняются nginx при отдаче страницы)
+        const SSI_USER = '<!--# echo var="ssi_user" default="" -->';
+        const SSI_EMAIL = '<!--# echo var="ssi_email" default="" -->';
+        const SSI_GROUPS = '<!--# echo var="ssi_groups" default="" -->';
+        const SSI_USERNAME = '<!--# echo var="ssi_username" default="" -->';
+        
+        let userGroups = [];
+        let isAdmin = false;
+        const adminGroups = ['admins'];
+        
+        // Конфигурация для logout - автоматически определяем хост
+        const KEYCLOAK_PORT = '5058';
+        const KEYCLOAK_LOGOUT_URL = window.location.protocol + '//' + window.location.hostname + ':' + KEYCLOAK_PORT + '/realms/platform/protocol/openid-connect/logout';
+        const POST_LOGOUT_REDIRECT = window.location.origin + '/';
+        
+        // Функция выхода - полная очистка сессий OAuth2-Proxy и Keycloak
+        async function logout() {
+            // Шаг 1: Очищаем сессию OAuth2-Proxy (на сервере и в cookie)
+            try {
+                // Вызываем sign_out чтобы очистить серверную сессию
+                await fetch('/oauth2/sign_out', { 
+                    method: 'GET',
+                    credentials: 'include',
+                    redirect: 'manual' // Не следовать редиректам
+                });
+            } catch (e) {
+                console.log('Sign out fetch:', e);
+            }
+            
+            // Удаляем cookie OAuth2-Proxy на клиенте
+            document.cookie = '_oauth2_proxy=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = '_oauth2_proxy_csrf=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            
+            // Шаг 2: Перенаправляем на Keycloak logout для очистки SSO сессии
+            const logoutUrl = KEYCLOAK_LOGOUT_URL + 
+                '?client_id=oauth2-proxy' +
+                '&post_logout_redirect_uri=' + encodeURIComponent(POST_LOGOUT_REDIRECT);
+            window.location.href = logoutUrl;
+        }
+        
+        // Загрузка информации о пользователе из SSI данных
+        async function loadUserInfo() {
+            try {
+                // Используем данные из SSI
+                const userName = SSI_USERNAME || SSI_USER || SSI_EMAIL || 'Пользователь';
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+                
+                // Парсим группы из строки (формат: "group1,group2,group3" или с путями "/group1")
+                if (SSI_GROUPS) {
+                    userGroups = SSI_GROUPS.split(',')
+                        .map(g => g.trim().replace(/^\//, ''))  // Убираем leading slash
+                        .filter(g => g.length > 0);
+                }
+                
+                isAdmin = userGroups.some(g => adminGroups.includes(g));
+                console.log('SSI User:', SSI_USER, 'Groups:', userGroups, 'isAdmin:', isAdmin);
+                
+                // Показать ссылку на Keycloak для админов
+                if (isAdmin) {
+                    document.getElementById('keycloakLink').style.display = 'inline';
+                }
+                
+                // Загрузить приложения после получения групп
+                await loadApps();
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                document.getElementById('appsGrid').innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Ошибка загрузки</p></div>';
+            }
+        }
+        
+        // Загрузка списка приложений
+        async function loadApps() {
+            try {
+                const response = await fetch('/apps.json?' + Date.now());
+                if (!response.ok) throw new Error('Failed to load apps');
+                
+                const config = await response.json();
+                renderApps(config.apps);
+            } catch (error) {
+                console.error('Error loading apps:', error);
+                document.getElementById('appsGrid').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>Нет доступных приложений</p></div>';
+            }
+        }
+        
+        // Отрисовка приложений с фильтрацией по группам
+        function renderApps(apps) {
+            const grid = document.getElementById('appsGrid');
+            grid.innerHTML = '';
+            
+            // Фильтрация по группам пользователя
+            const filteredApps = apps.filter(app => {
+                // Админ-only приложения только для админов
+                if (app.adminOnly && !isAdmin) return false;
+                
+                // Проверка групп
+                if (app.groups && app.groups.length > 0) {
+                    return app.groups.some(g => userGroups.includes(g));
+                }
+                
+                return true;
+            });
+            
+            if (filteredApps.length === 0 && !isAdmin) {
+                grid.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔒</div><p>У вас нет доступа к приложениям.<br>Обратитесь к администратору.</p></div>';
+                document.getElementById('appsCount').textContent = '0';
+                return;
+            }
+            
+            // Отрисовка карточек приложений
+            filteredApps.forEach(app => {
+                const card = createAppCard(app);
+                grid.appendChild(card);
+            });
+            
+            // Карточка "Добавить приложение" только для админов
+            if (isAdmin) {
+                const addCard = createAddCard();
+                grid.appendChild(addCard);
+            }
+            
+            document.getElementById('appsCount').textContent = filteredApps.length;
+        }
+        
+        // Создание карточки приложения
+        function createAppCard(app) {
+            const card = document.createElement('a');
+            card.href = app.url;
+            card.className = 'app-card' + (app.adminOnly ? ' admin-only' : '');
+            
+            card.innerHTML = `
+                <div class="app-header">
+                    <div class="app-icon">${app.icon || '📦'}</div>
+                    <div class="app-status">
+                        <span class="status-dot ${app.status === 'offline' ? 'offline' : ''}"></span>
+                        ${app.status === 'online' ? 'Доступно' : 'Недоступно'}
+                    </div>
+                </div>
+                <h3 class="app-title">${app.name}</h3>
+                <p class="app-description">${app.description}</p>
+                <div class="app-footer">
+                    <div class="app-groups">
+                        ${app.groups ? app.groups.map(g => `<span class="app-group-tag">${g}</span>`).join('') : ''}
+                    </div>
+                    <span class="app-link">
+                        Открыть
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12,5 19,12 12,19"></polyline>
+                        </svg>
+                    </span>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // Создание карточки добавления
+        function createAddCard() {
+            const card = document.createElement('div');
+            card.className = 'add-app-card';
+            card.onclick = openModal;
+            
+            card.innerHTML = `
+                <div class="add-icon">+</div>
+                <div class="add-title">Добавить приложение</div>
+                <div class="add-description">Подключите новое приложение к платформе</div>
+            `;
+            
+            return card;
+        }
+        
+        function openModal() {
+            document.getElementById('addAppModal').classList.add('active');
+        }
+        
+        function closeModal() {
+            document.getElementById('addAppModal').classList.remove('active');
+        }
+        
+        // Закрытие модалки по клику вне её
+        document.getElementById('addAppModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        
+        // Инициализация
+        loadUserInfo();
+    </script>
+</body>
+</html>

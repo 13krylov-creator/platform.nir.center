@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Демо-приложение 1</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --surface: #16213e;
+            --primary: #0f3460;
+            --accent: #e94560;
+            --text: #eaeaea;
+            --text-muted: #8b8b8b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 2px solid var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: var(--accent);
+            font-size: 1.25rem;
+        }
+        
+        .badge {
+            background: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+        }
+        
+        .main {
+            flex: 1;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .terminal {
+            background: #000;
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal-header {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--primary);
+        }
+        
+        .terminal-line {
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+        
+        .prompt {
+            color: var(--accent);
+        }
+        
+        .key {
+            color: #00d9ff;
+        }
+        
+        .value {
+            color: #98c379;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .info-card {
+            background: var(--surface);
+            border-left: 3px solid var(--accent);
+            padding: 1rem;
+        }
+        
+        .info-card h3 {
+            color: var(--accent);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .footer {
+            background: var(--surface);
+            padding: 1rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        a {
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>[ DEMO APP 1 ]</h1>
+        <div class="badge">Docker Container</div>
+    </header>
+    
+    <main class="main">
+        <div class="terminal">
+            <div class="terminal-header">$ cat /auth/user-info</div>
+            <div class="terminal-line">
+                <span class="prompt">&gt;</span> 
+                <span class="key">X-Auth-Request-User:</span> 
+                <span class="value" id="authUser">загрузка...</span>
+            </div>
+            <div class="terminal-line">
+                <span class="prompt">&gt;</span> 
+                <span class="key">X-Auth-Request-Email:</span> 
+                <span class="value" id="authEmail">загрузка...</span>
+            </div>
+            <div class="terminal-line">
+                <span class="prompt">&gt;</span> 
+                <span class="key">X-Auth-Request-Groups:</span> 
+                <span class="value" id="authGroups">загрузка...</span>
+            </div>
+        </div>
+        
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Описание</h3>
+                <p>Это демо-приложение работает в Docker-контейнере и защищено через IAM Platform.</p>
+            </div>
+            <div class="info-card">
+                <h3>Доступ</h3>
+                <p>Приложение доступно только для аутентифицированных пользователей.</p>
+            </div>
+            <div class="info-card">
+                <h3>Группы</h3>
+                <p>Настройте RBAC в nginx/conf.d/30-app-docker-example.conf</p>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <a href="http://localhost">&larr; Вернуться на портал</a>
+    </footer>
+    
+    <script>
+        // Заголовки устанавливаются Nginx после auth_request
+        // В реальном приложении они доступны на бэкенде
+        // Здесь демонстрируем через fetch к специальному endpoint
+        
+        // Для демо показываем placeholder - реальные данные 
+        // будут доступны в бэкенд-приложении через заголовки
+        document.getElementById('authUser').textContent = '[доступно на бэкенде]';
+        document.getElementById('authEmail').textContent = '[доступно на бэкенде]';
+        document.getElementById('authGroups').textContent = '[доступно на бэкенде]';
+    </script>
+</body>
+</html>

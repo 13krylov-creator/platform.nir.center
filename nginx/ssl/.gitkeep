@@ -1,0 +1,11 @@
+# Директория для SSL-сертификатов
+# 
+# В production поместите сюда:
+# - cert.pem (сертификат)
+# - key.pem (приватный ключ)
+# - dhparam.pem (DH параметры, опционально)
+#
+# Для генерации self-signed сертификата (только для тестирования):
+# openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+#   -keyout key.pem -out cert.pem \
+#   -subj "/CN=localhost"

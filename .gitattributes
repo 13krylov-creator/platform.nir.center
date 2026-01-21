@@ -1,0 +1,24 @@
+# Автоматическое определение текстовых файлов и нормализация окончаний строк
+* text=auto eol=lf
+
+# Явное указание для конфигурационных файлов
+*.conf text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.env text eol=lf
+*.example text eol=lf
+
+# Скрипты должны иметь LF, иначе будет ошибка "bad interpreter"
+*.bash text eol=lf
+
+# Бинарные файлы - не трогать
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.crt binary
+*.key binary

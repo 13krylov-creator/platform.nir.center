@@ -1,0 +1,255 @@
+# =============================================================================
+# IAM Platform - Docker Compose Configuration
+# =============================================================================
+# Запуск: docker compose up -d
+# Логи:   docker compose logs -f
+# Стоп:   docker compose down
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # NGINX - Reverse Proxy и Entry Point
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: iam-nginx
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-5056}:80"
+      - "${HTTPS_PORT:-5057}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/snippets:/etc/nginx/snippets:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/html:/usr/share/nginx/html:ro
+    environment:
+      - DOMAIN=${DOMAIN:-localhost}
+      - ENV=${ENV:-dev}
+    networks:
+      - iam-network
+    # Доступ к хост-сервисам (для приложений вне Docker)
+    # Windows/Mac: host-gateway автоматически определяет IP хоста
+    # Linux (Docker 20.10+): host-gateway работает
+    # Linux (старые версии): замените на 172.17.0.1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - oauth2-proxy
+      - keycloak
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # KEYCLOAK - Identity Provider
+  # ---------------------------------------------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: iam-keycloak
+    restart: unless-stopped
+    # Порт открыт только для dev-режима (прямой доступ к UI)
+    # В prod - доступ только через Nginx
+    ports:
+      - "${KEYCLOAK_PORT:-5058}:8080"
+    environment:
+      # Админ-учетные данные
+      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
+      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      # База данных
+      - KC_DB=${KC_DB:-postgres}
+      - KC_DB_URL=${KC_DB_URL:-jdbc:postgresql://postgres:5432/keycloak}
+      - KC_DB_USERNAME=${KC_DB_USERNAME:-keycloak}
+      - KC_DB_PASSWORD=${KC_DB_PASSWORD:-keycloak}
+      # Настройки хоста
+      - KC_HOSTNAME_STRICT=false
+      - KC_HOSTNAME_STRICT_HTTPS=false
+      - KC_HTTP_ENABLED=true
+      - KC_PROXY_HEADERS=xforwarded
+      # Здоровье и метрики
+      - KC_HEALTH_ENABLED=true
+      - KC_METRICS_ENABLED=true
+    command: ${KC_START_MODE:-start-dev} --import-realm
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      - keycloak-data:/opt/keycloak/data
+    networks:
+      - iam-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ---------------------------------------------------------------------------
+  # OAUTH2-PROXY - Authentication Proxy
+  # ---------------------------------------------------------------------------
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    container_name: iam-oauth2-proxy
+    restart: unless-stopped
+    # Порт НЕ открыт наружу - доступ только через Nginx
+    expose:
+      - "4180"
+    environment:
+      # OIDC Provider (Keycloak) - отключаем auto-discovery для контроля URL
+      - OAUTH2_PROXY_PROVIDER=oidc
+      - OAUTH2_PROXY_SKIP_OIDC_DISCOVERY=true
+      # Issuer URL для верификации токенов (должен совпадать с issuer в токене)
+      - OAUTH2_PROXY_OIDC_ISSUER_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:5058}/realms/${KEYCLOAK_REALM:-platform}
+      # Пропуск проверки issuer (для dev когда внешний и внутренний URL разные)
+      - OAUTH2_PROXY_INSECURE_OIDC_SKIP_ISSUER_VERIFICATION=true
+      # URL для браузера (внешние) - используются для редиректов
+      - OAUTH2_PROXY_LOGIN_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:5058}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/auth
+      # URL для server-to-server (внутренние) - используются для обмена токенами
+      - OAUTH2_PROXY_REDEEM_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/token
+      - OAUTH2_PROXY_OIDC_JWKS_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/certs
+      - OAUTH2_PROXY_PROFILE_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/userinfo
+      - OAUTH2_PROXY_VALIDATE_URL=${KEYCLOAK_INTERNAL_URL:-http://keycloak:8080}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/userinfo
+      - OAUTH2_PROXY_CLIENT_ID=${OAUTH2_CLIENT_ID:-oauth2-proxy}
+      - OAUTH2_PROXY_CLIENT_SECRET=${OAUTH2_CLIENT_SECRET:-oauth2_proxy_secret}
+      # Scopes (groups claim настроен через protocol mapper в Keycloak)
+      - OAUTH2_PROXY_SCOPE=openid email profile
+      # PKCE (требуется Keycloak)
+      - OAUTH2_PROXY_CODE_CHALLENGE_METHOD=S256
+      # Cookie настройки
+      - OAUTH2_PROXY_COOKIE_SECRET=${OAUTH2_COOKIE_SECRET:-GENERATE_ME_32_BYTES_BASE64_SECRET}
+      - OAUTH2_PROXY_COOKIE_SECURE=${COOKIE_SECURE:-false}
+      - OAUTH2_PROXY_COOKIE_NAME=${COOKIE_NAME:-_oauth2_proxy}
+      # Для localhost не используем domain (cookie будет для каждого хоста отдельно)
+      # Для prod нужно указать .yourdomain.com
+      - OAUTH2_PROXY_COOKIE_SAMESITE=lax
+      # CSRF cookie настройки - обязательны для работы между поддоменами
+      - OAUTH2_PROXY_COOKIE_CSRF_PER_REQUEST=true
+      - OAUTH2_PROXY_COOKIE_CSRF_EXPIRE=5m
+      # Redis для сессий
+      - OAUTH2_PROXY_SESSION_STORE_TYPE=redis
+      - OAUTH2_PROXY_REDIS_CONNECTION_URL=${REDIS_URL:-redis://redis:6379}
+      - OAUTH2_PROXY_REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      # Redirect URL для callback (с портом для dev)
+      - OAUTH2_PROXY_REDIRECT_URL=http://${DOMAIN:-localhost}:${HTTP_PORT:-5056}/oauth2/callback
+      # Whitelist доменов для редиректа (динамический redirect на основе хоста)
+      - OAUTH2_PROXY_WHITELIST_DOMAINS=.localhost:*,localhost:*
+      # Logout - перенаправление на Keycloak logout для полной очистки сессии
+      - OAUTH2_PROXY_PROVIDER_LOGOUT_URL=${KEYCLOAK_EXTERNAL_URL:-http://localhost:5058}/realms/${KEYCLOAK_REALM:-platform}/protocol/openid-connect/logout?post_logout_redirect_uri=http://${DOMAIN:-localhost}:${HTTP_PORT:-5056}/&client_id=${OAUTH2_CLIENT_ID:-oauth2-proxy}
+      # Настройки прокси
+      - OAUTH2_PROXY_HTTP_ADDRESS=0.0.0.0:4180
+      - OAUTH2_PROXY_REVERSE_PROXY=true
+      - OAUTH2_PROXY_REAL_CLIENT_IP_HEADER=X-Forwarded-For
+      # Email domain (разрешить все)
+      - OAUTH2_PROXY_EMAIL_DOMAINS=*
+      # Передача информации о пользователе
+      - OAUTH2_PROXY_SET_XAUTHREQUEST=true
+      - OAUTH2_PROXY_PASS_ACCESS_TOKEN=true
+      - OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER=true
+      - OAUTH2_PROXY_SET_AUTHORIZATION_HEADER=true
+      # Группы и роли из Keycloak
+      - OAUTH2_PROXY_OIDC_GROUPS_CLAIM=groups
+      # Разрешить всем аутентифицированным (RBAC на уровне nginx)
+      # Скрыть баннер
+      - OAUTH2_PROXY_SKIP_PROVIDER_BUTTON=true
+      # Логирование
+      - OAUTH2_PROXY_LOGGING_FILENAME=
+      - OAUTH2_PROXY_STANDARD_LOGGING=true
+      - OAUTH2_PROXY_REQUEST_LOGGING=true
+    networks:
+      - iam-network
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:4180/ping || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ---------------------------------------------------------------------------
+  # REDIS - Session Storage
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:alpine
+    container_name: iam-redis
+    restart: unless-stopped
+    # Порт НЕ открыт наружу
+    expose:
+      - "6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-redis_password}
+    volumes:
+      - redis-data:/data
+    networks:
+      - iam-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_password}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # POSTGRESQL - Database for Keycloak
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: iam-postgres
+    restart: unless-stopped
+    # Порт НЕ открыт наружу
+    expose:
+      - "5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-keycloak}
+      - POSTGRES_USER=${POSTGRES_USER:-keycloak}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-keycloak}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - iam-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-keycloak} -d ${POSTGRES_DB:-keycloak}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # DEMO APP 1 - Пример Docker-приложения (для тестирования)
+  # ---------------------------------------------------------------------------
+  demo-app1:
+    image: nginx:alpine
+    container_name: demo-app1
+    restart: unless-stopped
+    # Порт НЕ открыт наружу - доступ только через IAM
+    expose:
+      - "80"
+    volumes:
+      - ./demo-apps/app1:/usr/share/nginx/html:ro
+    networks:
+      - iam-network
+
+# =============================================================================
+# СЕТИ
+# =============================================================================
+networks:
+  iam-network:
+    name: iam-network
+    driver: bridge
+
+# =============================================================================
+# ТОМА
+# =============================================================================
+volumes:
+  keycloak-data:
+    name: iam-keycloak-data
+  postgres-data:
+    name: iam-postgres-data
+  redis-data:
+    name: iam-redis-data

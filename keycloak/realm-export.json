@@ -1,0 +1,301 @@
+{
+  "id": "platform",
+  "realm": "platform",
+  "displayName": "IAM Platform",
+  "displayNameHtml": "<div class=\"kc-logo-text\"><span>IAM Platform</span></div>",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "defaultSignatureAlgorithm": "RS256",
+  "accessTokenLifespan": 300,
+  "accessTokenLifespanForImplicitFlow": 900,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "offlineSessionIdleTimeout": 2592000,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanUserAction": 300,
+  "accessCodeLifespanLogin": 1800,
+  "actionTokenGeneratedByAdminLifespan": 43200,
+  "actionTokenGeneratedByUserLifespan": 300,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Администратор платформы с полным доступом",
+        "composite": false
+      },
+      {
+        "name": "user",
+        "description": "Обычный пользователь платформы",
+        "composite": false
+      },
+      {
+        "name": "manager",
+        "description": "Менеджер с расширенными правами",
+        "composite": false
+      }
+    ],
+    "client": {
+      "oauth2-proxy": [
+        {
+          "name": "proxy-user",
+          "description": "Роль для пользователей OAuth2-Proxy"
+        }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "admins",
+      "path": "/admins",
+      "realmRoles": ["admin"],
+      "subGroups": []
+    },
+    {
+      "name": "users",
+      "path": "/users",
+      "realmRoles": ["user"],
+      "subGroups": []
+    },
+    {
+      "name": "managers",
+      "path": "/managers",
+      "realmRoles": ["manager"],
+      "subGroups": []
+    },
+    {
+      "name": "app1-users",
+      "path": "/app1-users",
+      "realmRoles": ["user"],
+      "subGroups": []
+    },
+    {
+      "name": "app2-users",
+      "path": "/app2-users",
+      "realmRoles": ["user"],
+      "subGroups": []
+    },
+    {
+      "name": "api-users",
+      "path": "/api-users",
+      "realmRoles": ["user"],
+      "subGroups": []
+    }
+  ],
+  "defaultGroups": ["/users"],
+  "clients": [
+    {
+      "clientId": "oauth2-proxy",
+      "name": "OAuth2 Proxy",
+      "description": "Клиент для OAuth2-Proxy аутентификации",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "oauth2_proxy_secret_change_me",
+      "redirectUris": [
+        "http://localhost/oauth2/callback",
+        "http://localhost:5056/oauth2/callback",
+        "http://localhost:*/oauth2/callback",
+        "http://app1.localhost/oauth2/callback",
+        "http://app1.localhost:*/oauth2/callback",
+        "http://app2.localhost/oauth2/callback",
+        "http://app2.localhost:*/oauth2/callback",
+        "http://auth.localhost/oauth2/callback",
+        "http://platform.nir.center/oauth2/callback",
+        "http://platform.nir.center:5056/oauth2/callback",
+        "http://platform.nir.center:*/oauth2/callback",
+        "http://app1.nir.center/oauth2/callback",
+        "http://app1.nir.center:*/oauth2/callback",
+        "https://localhost/oauth2/callback",
+        "https://localhost:*/oauth2/callback",
+        "https://app1.localhost/oauth2/callback",
+        "https://app2.localhost/oauth2/callback",
+        "https://platform.nir.center/oauth2/callback",
+        "https://platform.nir.center:*/oauth2/callback"
+      ],
+      "webOrigins": [
+        "http://localhost",
+        "http://*.localhost",
+        "http://platform.nir.center",
+        "http://*.nir.center",
+        "https://localhost",
+        "https://*.localhost",
+        "https://platform.nir.center",
+        "https://*.nir.center"
+      ],
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "frontchannelLogout": true,
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost/*##http://localhost:5056/*##http://localhost:*/*##http://app1.localhost/*##http://app1.localhost:*/*##http://app2.localhost/*##http://app2.localhost:*/*##http://platform.nir.center/*##http://platform.nir.center:5056/*##http://platform.nir.center:*/*##http://*.nir.center/*##https://localhost/*##https://localhost:*/*##https://*.localhost/*##https://platform.nir.center/*##https://platform.nir.center:5056/*##https://platform.nir.center:*/*",
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "roles",
+            "userinfo.token.claim": "true",
+            "multivalued": "true"
+          }
+        },
+        {
+          "name": "audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "oauth2-proxy",
+            "id.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        }
+      ],
+      "defaultClientScopes": [
+        "web-origins",
+        "profile",
+        "roles",
+        "email",
+        "microprofile-jwt"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@platform.local",
+      "firstName": "Администратор",
+      "lastName": "Платформы",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": true
+        }
+      ],
+      "groups": ["/admins", "/users"],
+      "realmRoles": ["admin", "user"]
+    },
+    {
+      "username": "user1",
+      "email": "user1@platform.local",
+      "firstName": "Пользователь",
+      "lastName": "Первый",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user123",
+          "temporary": true
+        }
+      ],
+      "groups": ["/users", "/app1-users"],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "user2",
+      "email": "user2@platform.local",
+      "firstName": "Пользователь",
+      "lastName": "Второй",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "user123",
+          "temporary": true
+        }
+      ],
+      "groups": ["/users", "/app2-users"],
+      "realmRoles": ["user"]
+    },
+    {
+      "username": "manager",
+      "email": "manager@platform.local",
+      "firstName": "Менеджер",
+      "lastName": "Отдела",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "manager123",
+          "temporary": true
+        }
+      ],
+      "groups": ["/managers", "/users", "/app1-users", "/app2-users"],
+      "realmRoles": ["manager", "user"]
+    }
+  ],
+  "browserSecurityHeaders": {
+    "contentSecurityPolicyReportOnly": "",
+    "xContentTypeOptions": "nosniff",
+    "referrerPolicy": "strict-origin-when-cross-origin",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "xXSSProtection": "1; mode=block",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  },
+  "smtpServer": {},
+  "internationalizationEnabled": true,
+  "supportedLocales": ["en", "ru"],
+  "defaultLocale": "ru",
+  "eventsEnabled": true,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "REGISTER",
+    "REGISTER_ERROR",
+    "UPDATE_PASSWORD",
+    "UPDATE_PROFILE",
+    "SEND_RESET_PASSWORD",
+    "UPDATE_TOTP",
+    "VERIFY_EMAIL"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true
+}
