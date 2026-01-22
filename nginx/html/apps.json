@@ -23,7 +23,7 @@
       "id": "anonymize",
       "name": "anonymize",
       "description": "Обезличиватель",
-      "url": "/anonymize/",
+      "url": "http://anonymize.nir.center/",
       "icon": "🌐",
       "groups": ["admins", "app1-users"],
       "status": "online"
