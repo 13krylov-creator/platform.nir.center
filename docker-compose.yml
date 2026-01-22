@@ -97,8 +97,9 @@ services:
     # Порт НЕ открыт наружу - доступ только через Nginx
     expose:
       - "4180"
+    command: --cookie-domain=".nir.center" --whitelist-domain=".nir.center"
     environment:
-      - OAUTH2_PROXY_COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - OAUTH2_PROXY_COOKIE_DOMAIN=.nir.center
       # OIDC Provider (Keycloak) - отключаем auto-discovery для контроля URL
       - OAUTH2_PROXY_PROVIDER=oidc
       - OAUTH2_PROXY_SKIP_OIDC_DISCOVERY=true
