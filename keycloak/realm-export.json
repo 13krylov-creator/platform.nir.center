@@ -104,35 +104,18 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "oauth2_proxy_secret_change_me",
       "redirectUris": [
-        "http://localhost/oauth2/callback",
-        "http://localhost:5056/oauth2/callback",
-        "http://localhost:*/oauth2/callback",
-        "http://app1.localhost/oauth2/callback",
-        "http://app1.localhost:*/oauth2/callback",
-        "http://app2.localhost/oauth2/callback",
-        "http://app2.localhost:*/oauth2/callback",
-        "http://auth.localhost/oauth2/callback",
         "http://platform.nir.center/oauth2/callback",
-        "http://platform.nir.center:5056/oauth2/callback",
-        "http://platform.nir.center:*/oauth2/callback",
+        "http://anonymize.nir.center/oauth2/callback",
         "http://app1.nir.center/oauth2/callback",
-        "http://app1.nir.center:*/oauth2/callback",
-        "https://localhost/oauth2/callback",
-        "https://localhost:*/oauth2/callback",
-        "https://app1.localhost/oauth2/callback",
-        "https://app2.localhost/oauth2/callback",
-        "https://platform.nir.center/oauth2/callback",
-        "https://platform.nir.center:*/oauth2/callback"
+        "http://auth.nir.center/oauth2/callback",
+        "http://localhost/oauth2/callback",
+        "http://platform.nir.center:5056/oauth2/callback"
       ],
       "webOrigins": [
-        "http://localhost",
-        "http://*.localhost",
         "http://platform.nir.center",
-        "http://*.nir.center",
-        "https://localhost",
-        "https://*.localhost",
-        "https://platform.nir.center",
-        "https://*.nir.center"
+        "http://anonymize.nir.center",
+        "http://app1.nir.center",
+        "http://*.nir.center"
       ],
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
@@ -142,7 +125,7 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost/*##http://localhost:5056/*##http://localhost:*/*##http://app1.localhost/*##http://app1.localhost:*/*##http://app2.localhost/*##http://app2.localhost:*/*##http://platform.nir.center/*##http://platform.nir.center:5056/*##http://platform.nir.center:*/*##http://*.nir.center/*##https://localhost/*##https://localhost:*/*##https://*.localhost/*##https://platform.nir.center/*##https://platform.nir.center:5056/*##https://platform.nir.center:*/*",
+        "post.logout.redirect.uris": "http://platform.nir.center/*##http://anonymize.nir.center/*##http://app1.nir.center/*##http://*.nir.center/*",
         "pkce.code.challenge.method": "S256"
       },
       "protocolMappers": [
