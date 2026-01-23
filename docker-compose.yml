@@ -38,7 +38,7 @@ services:
       - oauth2-proxy
       - keycloak
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: [ "CMD", "nginx", "-t" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -81,7 +81,19 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"]
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/127.0.0.1/8080;echo -e 'GET /health/ready HTTP/1.1\r
+
+            host: localhost\r
+
+            Connection: close\r
+
+            \r
+
+            ' >&3;if [ $? -eq 0 ]; then echo 'Healthcheck Successful';exit 0;else echo 'Healthcheck Failed';exit 1;fi;"
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -168,7 +180,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget --quiet --spider http://localhost:4180/ping || exit 0"]
+      test: [ "CMD-SHELL", "wget --quiet --spider http://localhost:4180/ping || exit 0" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -185,15 +197,13 @@ services:
     expose:
       - "6379"
     command: >
-      redis-server
-      --appendonly yes
-      --requirepass ${REDIS_PASSWORD:-redis_password}
+      redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis_password}
     volumes:
       - redis-data:/data
     networks:
       - iam-network
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_password}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis_password}", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -217,7 +227,7 @@ services:
     networks:
       - iam-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-keycloak} -d ${POSTGRES_DB:-keycloak}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-keycloak} -d ${POSTGRES_DB:-keycloak}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -236,6 +246,39 @@ services:
       - ./demo-apps/app1:/usr/share/nginx/html:ro
     networks:
       - iam-network
+
+  # ---------------------------------------------------------------------------
+  # APP MANAGER - API для управления приложениями
+  # ---------------------------------------------------------------------------
+  app-manager:
+    build:
+      context: ./app-manager
+      dockerfile: Dockerfile
+    container_name: iam-app-manager
+    restart: unless-stopped
+    expose:
+      - "8000"
+    environment:
+      - APPS_JSON_PATH=/data/apps.json
+      - NGINX_CONF_DIR=/nginx-conf
+      - NGINX_CONTAINER=iam-nginx
+    volumes:
+      # Доступ к apps.json для чтения/записи
+      - ./nginx/html/apps.json:/data/apps.json:rw
+      # Доступ к nginx conf.d для генерации конфигов
+      - ./nginx/conf.d:/nginx-conf:rw
+      # Docker socket для reload nginx
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - iam-network
+    depends_on:
+      - nginx
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
 # =============================================================================
 # СЕТИ
