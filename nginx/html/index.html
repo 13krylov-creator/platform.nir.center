@@ -672,59 +672,13 @@
         const KEYCLOAK_LOGOUT_URL = window.location.protocol + '//' + window.location.hostname + ':' + KEYCLOAK_PORT + '/realms/platform/protocol/openid-connect/logout';
         const POST_LOGOUT_REDIRECT = window.location.origin + '/';
 
-        // Функция выхода - полная очистка сессий OAuth2-Proxy и Keycloak
-        async function logout() {
-            console.log('[LOGOUT] Начало logout...');
-
-            // Шаг 0: Проверяем, авторизован ли пользователь
-            // Если сессии уже нет - просто редирект на главную (избегаем зависания на Keycloak)
-            try {
-                console.log('[LOGOUT] Проверяем /oauth2/userinfo...');
-                const authCheck = await fetch('/oauth2/userinfo', {
-                    credentials: 'include'
-                });
-                console.log('[LOGOUT] /oauth2/userinfo статус:', authCheck.status);
-                if (!authCheck.ok) {
-                    // Уже не авторизован - просто переходим на главную
-                    console.log('[LOGOUT] Не авторизован, редирект на /');
-                    window.location.href = '/';
-                    return;
-                }
-                console.log('[LOGOUT] Пользователь авторизован, продолжаем...');
-            } catch (e) {
-                // Ошибка запроса - вероятно сессии нет
-                console.log('[LOGOUT] Ошибка проверки:', e);
-                window.location.href = '/';
-                return;
-            }
-
-            // Шаг 1: Очищаем сессию OAuth2-Proxy (на сервере и в cookie)
-            try {
-                console.log('[LOGOUT] Вызываем /oauth2/sign_out...');
-                const signOutResp = await fetch('/oauth2/sign_out', {
-                    method: 'GET',
-                    credentials: 'include',
-                    redirect: 'manual' // Не следовать редиректам
-                });
-                console.log('[LOGOUT] /oauth2/sign_out ответ:', signOutResp.status, signOutResp.type);
-            } catch (e) {
-                console.log('[LOGOUT] Ошибка sign_out:', e);
-            }
-
-            // Удаляем cookie OAuth2-Proxy на клиенте
-            console.log('[LOGOUT] Cookies ДО удаления:', document.cookie);
-            document.cookie = '_oauth2_proxy=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = '_oauth2_proxy_csrf=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = '_oauth2_proxy=; Path=/; Domain=.nir.center; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            document.cookie = '_oauth2_proxy_csrf=; Path=/; Domain=.nir.center; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            console.log('[LOGOUT] Cookies ПОСЛЕ удаления:', document.cookie);
-
-            // Шаг 2: Перенаправляем на Keycloak logout для очистки SSO сессии
-            const logoutUrl = KEYCLOAK_LOGOUT_URL +
-                '?client_id=oauth2-proxy' +
-                '&post_logout_redirect_uri=' + encodeURIComponent(POST_LOGOUT_REDIRECT);
-            console.log('[LOGOUT] Редирект на:', logoutUrl);
-            window.location.href = logoutUrl;
+        // Функция выхода - редирект на OAuth2-Proxy sign_out
+        // OAuth2-Proxy сам очистит сессию Redis и перенаправит на Keycloak logout
+        // (настроено через OAUTH2_PROXY_PROVIDER_LOGOUT_URL)
+        function logout() {
+            console.log('[LOGOUT] Редирект на /oauth2/sign_out');
+            // Просто переходим на sign_out - OAuth2-Proxy сделает всё остальное
+            window.location.href = '/oauth2/sign_out';
         }
 
         // Загрузка информации о пользователе из SSI данных
