@@ -1,21 +1,14 @@
 {
   "apps": [
     {
-      "id": "app1",
-      "name": "Демо-приложение 1",
-      "description": "Пример защищенного приложения в Docker-контейнере. Демонстрирует работу SSO.",
-      "url": "/app1/",
-      "icon": "📊",
-      "groups": ["admins", "app1-users"],
-      "status": "online"
-    },
-    {
       "id": "keycloak",
       "name": "Keycloak Admin",
       "description": "Консоль администрирования Identity Provider. Управление пользователями и группами.",
       "url": "/keycloak-admin/",
       "icon": "⚙️",
-      "groups": ["admins"],
+      "groups": [
+        "admins"
+      ],
       "adminOnly": true,
       "status": "online"
     },
@@ -25,9 +18,50 @@
       "description": "Обезличиватель",
       "url": "http://anonymize.nir.center/",
       "icon": "🌐",
-      "groups": ["admins", "app1-users"],
+      "groups": [
+        "admins",
+        "app1-users"
+      ],
       "status": "online"
+    },
+    {
+      "id": "vks",
+      "name": "расшифровщик VKS",
+      "description": "расшифровщик VKS",
+      "url": "http://vks.nir.center",
+      "internal_url": "http://10.109.50.250:5000",
+      "icon": "📈",
+      "groups": [
+        "admins",
+        "app1-users"
+      ],
+      "status": "online",
+      "adminOnly": false,
+      "app_type": "docker",
+      "port": 5000,
+      "createdAt": "2026-01-26T07:34:50.070227",
+      "updatedAt": "2026-01-26T07:34:50.070227"
+    },
+    {
+      "id": "rag",
+      "name": "Документы",
+      "description": "Загрузка и поиск документов RAG",
+      "url": "http://rag.nir.center",
+      "internal_url": "http://10.109.50.250:5111",
+      "icon": "📋",
+      "groups": [
+        "admins",
+        "app1-users"
+      ],
+      "status": "online",
+      "adminOnly": false,
+      "app_type": "docker",
+      "port": 5111,
+      "createdAt": "2026-01-26T09:10:30.037645",
+      "updatedAt": "2026-01-26T09:10:30.037645"
     }
   ],
-  "adminGroups": ["admins"]
+  "adminGroups": [
+    "admins"
+  ]
 }

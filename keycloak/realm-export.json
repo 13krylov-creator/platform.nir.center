@@ -104,6 +104,8 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "oauth2_proxy_secret_change_me",
       "redirectUris": [
+        "http://*.nir.center/oauth2/callback",
+        "http://*.nir.center/*",
         "http://platform.nir.center/oauth2/callback",
         "http://anonymize.nir.center/oauth2/callback",
         "http://app1.nir.center/oauth2/callback",
@@ -114,6 +116,8 @@
       "webOrigins": [
         "http://platform.nir.center",
         "http://anonymize.nir.center",
+        "http://vks.nir.center",
+        "http://rag.nir.center",
         "http://app1.nir.center",
         "http://*.nir.center"
       ],
@@ -125,7 +129,7 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "http://platform.nir.center/*##http://anonymize.nir.center/*##http://app1.nir.center/*##http://*.nir.center/*",
+        "post.logout.redirect.uris": "http://platform.nir.center/*##http://*.nir.center/*##http://anonymize.nir.center/*##http://app1.nir.center/*",
         "pkce.code.challenge.method": "S256"
       },
       "protocolMappers": [
