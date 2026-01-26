@@ -3,9 +3,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Установка docker CLI для nginx reload
+# Установка docker CLI и curl для healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
     docker.io \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Копируем зависимости

@@ -171,16 +171,13 @@ def find_app_by_id(apps: list, app_id: str) -> tuple[int, dict] | tuple[None, No
 def generate_nginx_config(app_data: AppCreate) -> str:
     """Генерация nginx конфигурации для приложения"""
     
-    # Определяем upstream
-    if app_data.app_type == "docker":
-        upstream = f"http://{app_data.id}"
-        if app_data.port:
-            upstream = f"http://{app_data.id}:{app_data.port}"
-    elif app_data.app_type == "host":
-        port = app_data.port or 8080
-        upstream = f"http://host.docker.internal:{port}"
-    else:
-        upstream = app_data.url
+    # Определяем upstream - ВСЕГДА используем введенный пользователем URL
+    # Это позволяет работать как с Docker контейнерами (http://container:port),
+    # так и с внешними сервисами (http://10.0.0.1:port)
+    upstream = app_data.url
+    
+    # Убираем trailing slash если есть
+    upstream = upstream.rstrip('/')
     
     # Группы для RBAC
     groups_pattern = "|".join(app_data.groups) if app_data.groups else "admins"
@@ -188,6 +185,7 @@ def generate_nginx_config(app_data: AppCreate) -> str:
     config = f'''# =============================================================================
 # Приложение: {app_data.name}
 # Создано автоматически: {datetime.now().isoformat()}
+# Upstream: {upstream}
 # =============================================================================
 
 server {{
@@ -215,7 +213,7 @@ server {{
         include /etc/nginx/snippets/proxy-params.conf;
     }}
     
-    # Health check
+    # Health check (без аутентификации)
     location /health {{
         proxy_pass {upstream}/health;
         include /etc/nginx/snippets/proxy-params.conf;
