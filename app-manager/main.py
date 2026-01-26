@@ -23,6 +23,9 @@ APPS_JSON_PATH = os.environ.get("APPS_JSON_PATH", "/data/apps.json")
 NGINX_CONF_DIR = os.environ.get("NGINX_CONF_DIR", "/nginx-conf")
 NGINX_CONTAINER = os.environ.get("NGINX_CONTAINER", "iam-nginx")
 
+# Базовый домен для формирования URL приложений
+BASE_DOMAIN = os.environ.get("BASE_DOMAIN", "nir.center")
+
 # Предопределенные группы (из Keycloak)
 AVAILABLE_GROUPS = ["admins", "app1-users"]
 
@@ -303,11 +306,19 @@ async def create_app(app_data: AppCreate, _: bool = Depends(check_admin_access))
     
     # Создаем запись
     now = datetime.now().isoformat()
+    
+    # Формируем URL для отображения в браузере (красивый домен)
+    # Если создается nginx конфигурация - используем домен, иначе оставляем введенный URL
+    display_url = app_data.url
+    if app_data.createNginxConfig:
+        display_url = f"http://{app_data.id}.{BASE_DOMAIN}"
+    
     new_app = {
         "id": app_data.id,
         "name": app_data.name,
         "description": app_data.description,
-        "url": app_data.url,
+        "url": display_url,
+        "internal_url": app_data.url,  # Сохраняем оригинальный URL для отладки
         "icon": app_data.icon,
         "groups": app_data.groups,
         "status": app_data.status,
